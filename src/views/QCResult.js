@@ -9,21 +9,11 @@ import {
   Row,
   Col,
   Button,
-  Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from "reactstrap";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
-const dropdownValues = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
 
 function QcResult() {
-  const [dropdownOpen, setDropdownOpen] = useState(Array(5).fill(false));
-  const toggleDropdown = (index) => {
-    const newDropdownOpen = [...dropdownOpen];
-    newDropdownOpen[index] = !newDropdownOpen[index];
-    setDropdownOpen(newDropdownOpen);
-  };
-
   return (
     <>
       <div className="content">

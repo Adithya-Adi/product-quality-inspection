@@ -1,12 +1,12 @@
 import Dashboard from "views/Dashboard.js";
-import Notifications from "views/Notifications.js";
-import Icons from "views/Icons.js";
-import Typography from "views/Typography.js";
-import TableList from "views/Tables.js";
+// import Notifications from "views/Notifications.js";
+// import Icons from "views/Icons.js";
+// import Typography from "views/Typography.js";
+// import TableList from "views/Tables.js";
 import Templates from "views/Templates.js";
-import Maps from "views/Map.js";
-import UserPage from "views/User.js";
-import UpgradeToPro from "views/Upgrade.js";
+// import Maps from "views/Map.js";
+// import UserPage from "views/User.js";
+// import UpgradeToPro from "views/Upgrade.js";
 import Item from "views/Item";
 import QcResult from "views/QCResult";
 
