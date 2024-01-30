@@ -151,7 +151,7 @@ function Item() {
                               {item?.template ? item.template.templateName : 'Select Template'}
                             </DropdownToggle>
                             <DropdownMenu>
-                              {templates.map((template, templateIndex) => (
+                              {templates?.map((template, templateIndex) => (
                                 <DropdownItem
                                   key={templateIndex}
                                   onClick={() => {
