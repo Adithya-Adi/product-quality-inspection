@@ -10,14 +10,19 @@ import {
   Input,
   Row,
   Col,
+  Alert
 } from "reactstrap";
 import { FaEnvelope, FaLock } from 'react-icons/fa';
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { baseUrl } from "variables/environment";
 
 function Login() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // State for form data
+  // State
+  const [message, setMessage] = useState(null);
+  const [status, setStatus] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -31,10 +36,23 @@ function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your login logic here using formData
-    console.log("Form data submitted:", formData);
+    try {
+      const { data: response } = await axios.post(`${baseUrl}/api/admin/login`, formData);
+      localStorage.setItem("loggedInUser", response.data);
+      localStorage.setItem("token", response.token);
+      setStatus("success");
+      setMessage("Login Successfull");
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 1000);
+    } catch (error) {
+      console.log(error.response.data);
+      setMessage(error.response.data.message);
+      setStatus("danger");
+    }
+
   };
 
   return (
@@ -50,6 +68,11 @@ function Login() {
                 <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col className="pr-1">
+                      {message &&
+                        <Alert color={status}>
+                          {message}
+                        </Alert>
+                      }
                       <FormGroup>
                         <label style={{ color: "black" }}>Email</label>
                         <div className="input-group">

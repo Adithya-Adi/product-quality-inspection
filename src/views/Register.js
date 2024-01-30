@@ -10,16 +10,21 @@ import {
   Input,
   Row,
   Col,
+  Alert
 } from "reactstrap";
 import { FaEnvelope, FaLock, FaUser } from 'react-icons/fa';
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { baseUrl } from "variables/environment";
 
 function Register() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // State for form data
+  // State
+  const [message, setMessage] = useState(null);
+  const [status, setStatus] = useState(null);
   const [formData, setFormData] = useState({
-    username: "",
+    userName: "",
     email: "",
     password: "",
   });
@@ -32,10 +37,20 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your registration logic here using formData
-    console.log("Form data submitted:", formData);
+    try {
+      await axios.post(`${baseUrl}/api/admin/register`, formData);
+      setStatus("success");
+      setMessage("User Registered");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+    } catch (error) {
+      console.log(error.response.data);
+      setMessage(error.response.data.message);
+      setStatus("danger");
+    }
   };
 
   return (
@@ -51,6 +66,11 @@ function Register() {
                 <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col className="pr-1">
+                      {message &&
+                        <Alert color={status}>
+                          {message}
+                        </Alert>
+                      }
                       <FormGroup>
                         <label style={{ color: "black" }}>Username</label>
                         <div className="input-group">
@@ -60,10 +80,10 @@ function Register() {
                             </span>
                           </div>
                           <Input
-                            name="username"
+                            name="userName"
                             placeholder="Username *"
                             type="text"
-                            value={formData.username}
+                            value={formData.userName}
                             onChange={handleInputChange}
                           />
                         </div>

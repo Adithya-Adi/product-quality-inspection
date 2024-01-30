@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Card,
@@ -11,11 +11,57 @@ import {
   Input,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { baseUrl } from "variables/environment";
+import { useParams } from "react-router-dom";
 
 function AddQcValue() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [message, setMessage] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [formData, setFormData] = useState({
+    displayLabel: "",
+    uom: "",
+    expectedValue: 0,
+    minimumTolerance: 0,
+    maximumTolerance: 0
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    for (const key in formData) {
+      if (formData.hasOwnProperty(key) && (formData[key] === "" || formData[key] === null)) {
+        setMessage("Please fill in all fields.");
+        setStatus("danger");
+        return;
+      }
+    }
+    try {
+      await axios.post(`${baseUrl}/api/template/qcField/add/${id}`, formData);
+      setStatus("success");
+      setMessage("QC Field Added");
+      setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+    } catch (error) {
+      console.log(error.response.data);
+      setMessage(error.response.data.message);
+      setStatus("danger");
+    }
+  }
+
   return (
     <>
       <div className="content">
@@ -26,8 +72,12 @@ function AddQcValue() {
                 <CardTitle tag="h5">Add QC Field</CardTitle>
               </CardHeader>
               <CardBody>
-                <Form>
-
+                {message &&
+                  <Alert color={status}>
+                    {message}
+                  </Alert>
+                }
+                <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col className="pr-1" md="6">
                       <FormGroup>
@@ -35,6 +85,9 @@ function AddQcValue() {
                         <Input
                           placeholder="Display label *"
                           type="text"
+                          value={formData.displayLabel}
+                          onChange={handleInputChange}
+                          name="displayLabel"
                         />
                       </FormGroup>
                     </Col>
@@ -44,6 +97,9 @@ function AddQcValue() {
                         <Input
                           placeholder="Uom *"
                           type="text"
+                          value={formData.uom}
+                          onChange={handleInputChange}
+                          name="uom"
                         />
                       </FormGroup>
                     </Col>
@@ -59,7 +115,10 @@ function AddQcValue() {
                         <label>Expected Value</label>
                         <Input
                           placeholder="Expected Value *"
-                          type="text"
+                          type="number"
+                          value={formData.expectedValue}
+                          onChange={handleInputChange}
+                          name="expectedValue"
                         />
                       </FormGroup>
 
@@ -69,7 +128,10 @@ function AddQcValue() {
                         <label>Minimum Tolerance</label>
                         <Input
                           placeholder="Minimum Tolerance *"
-                          type="text"
+                          type="number"
+                          value={formData.minimumTolerance}
+                          onChange={handleInputChange}
+                          name="minimumTolerance"
                         />
                       </FormGroup>
 
@@ -79,7 +141,10 @@ function AddQcValue() {
                         <label>Maximum Tolerance</label>
                         <Input
                           placeholder="Maximum Tolerance *"
-                          type="text"
+                          type="number"
+                          value={formData.maximumTolerance}
+                          onChange={handleInputChange}
+                          name="maximumTolerance"
                         />
                       </FormGroup>
                     </Col>

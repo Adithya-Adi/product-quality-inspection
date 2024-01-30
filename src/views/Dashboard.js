@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // react plugin used to create charts
 import { Line } from "react-chartjs-2";
 // reactstrap components
@@ -15,8 +15,23 @@ import {
 import {
   dashboardNASDAQChart,
 } from "variables/charts.js";
+import axios from "axios";
+import { baseUrl } from "variables/environment";
 
 function Dashboard() {
+  const [stats, setStats] = useState(null);
+  const getStats = async () => {
+    try {
+      const { data: response } = await axios.get(`${baseUrl}/api/item/getItemStats`);
+      setStats(response.data);
+    } catch (error) {
+      console.error("Error", error);
+    }
+  }
+  useEffect(() => {
+    getStats();
+  }, [])
+
   return (
     <>
       <div className="content">
@@ -33,7 +48,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Total Item Tested</p>
-                      <CardTitle tag="p">13</CardTitle>
+                      <CardTitle tag="p">{stats?.totalItems}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -58,7 +73,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Approved</p>
-                      <CardTitle tag="p">11</CardTitle>
+                      <CardTitle tag="p">{stats?.approvedItems}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -83,7 +98,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Rejected</p>
-                      <CardTitle tag="p">2</CardTitle>
+                      <CardTitle tag="p">{stats?.rejectedItems}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -108,7 +123,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Efficiency</p>
-                      <CardTitle tag="p">84.6154%</CardTitle>
+                      <CardTitle tag="p">{stats?.efficiency.toFixed(2)}%</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -146,7 +161,7 @@ function Dashboard() {
           </Col>
         </Row> */}
         <Row>
-            {/* <Card>
+          {/* <Card>
               <CardHeader>
                 <CardTitle tag="h5">Email Statistics</CardTitle>
                 <p className="card-category">Last Campaign Performance</p>

@@ -1,7 +1,3 @@
- 
-// ##############################
-// // // table head data and table body data for Tables view
-// #############################
 
 const thead = ["Name", "Country", "City", "Salary"];
 const tbody = [

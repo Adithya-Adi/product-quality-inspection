@@ -18,7 +18,7 @@ export const addItem = async (itemData) => {
 
 export const getAllItems = async () => {
   try {
-    const items = await ItemModal.find();
+    const items = await ItemModal.find().populate("template");
     return {
       status: 200,
       message: "Items retrieved",
@@ -102,7 +102,7 @@ export const deleteItem = async (itemId) => {
 
 export const getItemById = async (itemId) => {
   try {
-    const item = await ItemModal.findById(itemId);
+    const item = await ItemModal.findById(itemId).populate("template");
     if (!item) {
       return {
         status: 404,

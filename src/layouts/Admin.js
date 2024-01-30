@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React from "react";
-// javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 
 import DemoNavbar from "components/Navbars/DemoNavbar.js";
 import Footer from "components/Footer/Footer.js";
@@ -17,8 +17,16 @@ import routes from "routes.js";
 var ps;
 
 function Dashboard(props) {
+  const loggedInUser = localStorage.getItem("loggedInUser");
+  const token = localStorage.getItem("token");
+
+  if (!loggedInUser || !token) {
+    return <Navigate to={"/"} replace></Navigate>;
+  }
+
   const mainPanel = React.useRef();
   const location = useLocation();
+
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(mainPanel.current);
@@ -30,11 +38,14 @@ function Dashboard(props) {
         document.body.classList.toggle("perfect-scrollbar-on");
       }
     };
-  });
+  }, []);
   React.useEffect(() => {
     mainPanel.current.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
   }, [location]);
+
+
+
   return (
     <div className="wrapper">
       <Sidebar
@@ -60,7 +71,7 @@ function Dashboard(props) {
           <Route path="/add-qc-value/:id" element={<AddQcValue />} />
           <Route path="/add-template" element={<AddTemplate />} />
           <Route path="/add-item" element={<AddItem />} />
-          <Route path="/add-item-qc-value/:id" element={<AddItemQcValue />} />
+          <Route path="/add-item-qc-value/:id/:prodNo/:templateNo" element={<AddItemQcValue />} />
           <Route path="/view-report/:id" element={<ViewReport />} />
         </Routes>
         <Footer fluid />

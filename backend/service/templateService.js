@@ -114,7 +114,8 @@ export const getAllQcFields = async (templateId) => {
     return {
       status: 200,
       message: "QC fields retrieved",
-      data: qcFields,
+      qcFields: qcFields,
+      template: template,
     };
   } catch (error) {
     console.error("Error getting QC fields:", error);

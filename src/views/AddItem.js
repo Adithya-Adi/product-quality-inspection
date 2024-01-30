@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Card,
@@ -11,11 +11,56 @@ import {
   Input,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { baseUrl } from "variables/environment";
 
 function AddItem() {
   const navigate = useNavigate();
+  const [message, setMessage] = useState(null);
+  const [status, setStatus] = useState(null);
+
+  const [formData, setFormData] = useState({
+    productPlanNo: "",
+    custPoNo: "",
+    salesOrderNo: "",
+    itemNo: "",
+    drawingNo: ""
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    for (const key in formData) {
+      if (formData.hasOwnProperty(key) && (formData[key] === "" || formData[key] === null)) {
+        setMessage("Please fill in all fields.");
+        setStatus("danger");
+        return;
+      }
+    }
+    try {
+      await axios.post(`${baseUrl}/api/item/add`, formData);
+      setStatus("success");
+      setMessage("Item Added");
+      setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+    } catch (error) {
+      console.log(error.response.data);
+      setMessage(error.response.data.message);
+      setStatus("danger");
+    }
+  }
+
   return (
     <>
       <div className="content">
@@ -26,8 +71,12 @@ function AddItem() {
                 <CardTitle tag="h5">Add Item</CardTitle>
               </CardHeader>
               <CardBody>
-                <Form>
-
+                {message &&
+                  <Alert color={status}>
+                    {message}
+                  </Alert>
+                }
+                <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col className="pr-1" md="6">
                       <FormGroup>
@@ -35,6 +84,9 @@ function AddItem() {
                         <Input
                           placeholder="Product Plan No *"
                           type="text"
+                          value={formData.productPlanNo}
+                          onChange={handleInputChange}
+                          name="productPlanNo"
                         />
                       </FormGroup>
                     </Col>
@@ -44,6 +96,9 @@ function AddItem() {
                         <Input
                           placeholder="Cust Po No *"
                           type="text"
+                          value={formData.custPoNo}
+                          onChange={handleInputChange}
+                          name="custPoNo"
                         />
                       </FormGroup>
                     </Col>
@@ -60,6 +115,9 @@ function AddItem() {
                         <Input
                           placeholder="Sales Order No *"
                           type="text"
+                          value={formData.salesOrderNo}
+                          onChange={handleInputChange}
+                          name="salesOrderNo"
                         />
                       </FormGroup>
 
@@ -70,6 +128,9 @@ function AddItem() {
                         <Input
                           placeholder="Item No *"
                           type="text"
+                          value={formData.itemNo}
+                          onChange={handleInputChange}
+                          name="itemNo"
                         />
                       </FormGroup>
 
@@ -80,6 +141,9 @@ function AddItem() {
                         <Input
                           placeholder="Drawing No *"
                           type="text"
+                          value={formData.drawingNo}
+                          onChange={handleInputChange}
+                          name="drawingNo"
                         />
                       </FormGroup>
                     </Col>

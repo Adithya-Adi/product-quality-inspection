@@ -49,7 +49,7 @@ const itemSchema = new Schema(
       // required: true
     },
     inspectedDate: {
-      type: Date,
+      type: String,
       // required: true
     },
     orderDueDate: {

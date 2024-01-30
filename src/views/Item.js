@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,20 +9,96 @@ import {
   Row,
   Col,
   Button,
-  Dropdown, DropdownToggle, DropdownMenu, DropdownItem
+  Alert,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  Spinner,
 } from "reactstrap";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-
-const dropdownValues = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+import axios from "axios";
+import { baseUrl } from "variables/environment";
 
 function Item() {
-  const [dropdownOpen, setDropdownOpen] = useState(Array(5).fill(false));
+  const [items, setItems] = useState(null);
+  const [templates, setTemplates] = useState(null);
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const toggleDropdown = (index) => {
-    const newDropdownOpen = [...dropdownOpen];
-    newDropdownOpen[index] = !newDropdownOpen[index];
-    setDropdownOpen(newDropdownOpen);
-  };
+    setOpenDropdownIndex(openDropdownIndex === index ? null : index);
+  }
+
+  const getTemplate = async () => {
+    try {
+      const { data: response } = await axios.get(`${baseUrl}/api/template/getAll`);
+      const filteredTemplates = response.data.filter(template => template.qcField.length !== 0);
+      setTemplates(filteredTemplates);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const getItem = async () => {
+    try {
+      setLoading(true);
+      const { data: response } = await axios.get(`${baseUrl}/api/item/getAll`);
+      setItems(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    getItem();
+    getTemplate();
+  }, [])
+
+
+  const handleTemplateChange = async (index, template) => {
+    const updatedItems = [...items];
+    updatedItems[index].template = template;
+    const itemId = updatedItems[index]._id;
+    setItems(updatedItems);
+    try {
+      await axios.patch(`${baseUrl}/api/item/assignTemplate/${itemId}/${template._id}`);
+      setStatus("success");
+      setMessage("Template Assigned");
+      setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+    } catch (error) {
+      console.log(error.response.data);
+      setMessage(error.response.data.message);
+      setStatus("danger");
+    }
+  }
+
+  const handleDelete = async (itemId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete?");
+
+    if (!confirmDelete) {
+      return;
+    }
+    try {
+      await axios.delete(`${baseUrl}/api/item/delete/${itemId}`);
+      setStatus("success");
+      setMessage("Item Deleted");
+      getItem();
+      setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+    } catch (error) {
+      console.log(error.response.data);
+      setMessage(error.response.data.message);
+      setStatus("danger");
+    }
+  }
+
 
   return (
     <>
@@ -42,6 +118,11 @@ function Item() {
                   </Col>
                 </Row>
               </CardHeader>
+              {message &&
+                <Alert color={status}>
+                  {message}
+                </Alert>
+              }
               <CardBody>
                 <Table responsive>
                   <thead className="text-primary">
@@ -57,38 +138,59 @@ function Item() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[1, 2, 3, 4, 5].map((rowIndex) => (
-                      <tr key={rowIndex}>
-                        <td>1</td>
-                        <td>112434</td>
-                        <td>Bruce Wayne</td>
-                        <td>135453</td>
-                        <td>RES-40098</td>
-                        <td>M-727</td>
+                    {items?.map((item, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{item.productPlanNo}</td>
+                        <td>{item.custPoNo}</td>
+                        <td>{item.salesOrderNo}</td>
+                        <td>{item.itemNo}</td>
+                        <td>{item.drawingNo}</td>
                         <td>
-                          <Dropdown isOpen={dropdownOpen[rowIndex - 1]} toggle={() => toggleDropdown(rowIndex - 1)}>
+                          <Dropdown isOpen={openDropdownIndex === index} toggle={() => toggleDropdown(index)}>
                             <DropdownToggle caret>
-                              Select Template
+                              {item?.template ? item.template.templateName : 'Select Template'}
                             </DropdownToggle>
                             <DropdownMenu>
-                              {dropdownValues.map((value, index) => (
-                                <DropdownItem key={index}>{value}</DropdownItem>
+                              {templates.map((template, templateIndex) => (
+                                <DropdownItem
+                                  key={templateIndex}
+                                  onClick={() => {
+                                    handleTemplateChange(index, template);
+                                    toggleDropdown(index);
+                                  }}
+                                >
+                                  {template.templateName}
+                                </DropdownItem>
                               ))}
                             </DropdownMenu>
                           </Dropdown>
                         </td>
 
                         <td>
-                          <Button className="btn-round btn btn-danger">Delete</Button>&nbsp;
+                          <Button className="btn-round btn btn-danger" onClick={() => handleDelete(item._id)}>Delete</Button>&nbsp;
                         </td>
                         <td>
-                          <Link to={`/admin/add-item-qc-value/${rowIndex}`}>
-                          <Button className="btn-round btn btn-success" >Add QC Value</Button>
-                          </Link>
+                          {item?.template &&
+                            <Link to={`/admin/add-item-qc-value/${item._id}/${item.productPlanNo}/${item.template._id}`}>
+                              <Button className="btn-round btn btn-success" >Add QC Value</Button>
+                            </Link>
+                          }
                         </td>
                       </tr>
                     ))}
 
+                    {items?.length === 0 &&
+                      <p>No Item Found</p>
+                    }
+                    {loading &&
+                      <Spinner
+                        color="info"
+                        type="grow"
+                      >
+                        Loading...
+                      </Spinner>
+                    }
                   </tbody>
                 </Table>
               </CardBody>
@@ -96,7 +198,7 @@ function Item() {
           </Col>
 
         </Row>
-      </div>
+      </div >
     </>
   );
 }
