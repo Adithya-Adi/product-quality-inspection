@@ -25,7 +25,7 @@ function Header(props) {
   };
 
   const getBrand = () => {
-    let brandName = "Shop Floor Management";
+    let brandName = "Product quality inspection";
     routes.map((prop, key) => {
       if (window.location.href.indexOf(prop.layout + prop.path) !== -1) {
         brandName = prop.name;
