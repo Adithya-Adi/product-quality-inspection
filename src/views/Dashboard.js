@@ -10,6 +10,7 @@ import {
   CardTitle,
   Row,
   Col,
+  Spinner,
 } from "reactstrap";
 // core components
 import {
@@ -20,12 +21,17 @@ import { baseUrl } from "variables/environment";
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const getStats = async () => {
     try {
+      setLoading(true);
       const { data: response } = await axios.get(`${baseUrl}/api/item/getItemStats`);
       setStats(response.data);
     } catch (error) {
       console.error("Error", error);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -48,7 +54,17 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Total Item Tested</p>
-                      <CardTitle tag="p">{stats?.totalItems}</CardTitle>
+                      <CardTitle tag="p">
+                        {loading &&
+                          <Spinner
+                            color="info"
+                            type="grow"
+                          >
+                            Loading...
+                          </Spinner>
+                        }
+                        {stats?.totalItems}
+                      </CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -73,7 +89,15 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Approved</p>
-                      <CardTitle tag="p">{stats?.approvedItems}</CardTitle>
+                      <CardTitle tag="p"> {loading &&
+                        <Spinner
+                          color="info"
+                          type="grow"
+                        >
+                          Loading...
+                        </Spinner>
+                      }
+                        {stats?.approvedItems}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -98,7 +122,17 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Rejected</p>
-                      <CardTitle tag="p">{stats?.rejectedItems}</CardTitle>
+                      <CardTitle tag="p">
+                        {loading &&
+                          <Spinner
+                            color="info"
+                            type="grow"
+                          >
+                            Loading...
+                          </Spinner>
+                        }
+                        {stats?.rejectedItems}
+                      </CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -123,7 +157,17 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Efficiency</p>
-                      <CardTitle tag="p">{stats?.efficiency.toFixed(2)}%</CardTitle>
+                      <CardTitle tag="p">
+                        {loading &&
+                          <Spinner
+                            color="info"
+                            type="grow"
+                          >
+                            Loading...
+                          </Spinner>
+                        }
+                        {stats?.efficiency.toFixed(2)}%
+                      </CardTitle>
                       <p />
                     </div>
                   </Col>
