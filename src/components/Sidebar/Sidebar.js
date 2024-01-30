@@ -50,7 +50,7 @@ function Sidebar(props) {
           href=" "
           className="simple-text logo-normal"
         >
-          Shop Floor Management
+          Product Quality Inspection
         </a>
       </div>
       <div className="sidebar-wrapper" ref={sidebar}>
