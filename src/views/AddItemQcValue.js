@@ -19,6 +19,7 @@ import { baseUrl } from "variables/environment";
 import { useParams } from "react-router-dom";
 
 function AddItemQcValue() {
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState(null);
   const { id } = useParams();
@@ -85,6 +86,7 @@ function AddItemQcValue() {
     }
 
     try {
+      setLoading(true);
       await axios.patch(`${baseUrl}/api/item/update/${id}`,
         {
           ...formData,
@@ -99,6 +101,8 @@ function AddItemQcValue() {
       console.log(error.response.data);
       setMessage(error.response.data.message);
       setStatus("danger");
+    }finally {
+      setLoading(false);
     }
   }
 
@@ -306,7 +310,9 @@ function AddItemQcValue() {
                         color="success"
                         type="submit"
                       >
-                        Add
+                        {loading ? "Please Wait..."
+                          : "Add"
+                        }
                       </Button>
                       <Button
                         className="btn-round"

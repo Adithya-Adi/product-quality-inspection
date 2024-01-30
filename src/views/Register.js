@@ -21,6 +21,7 @@ function Register() {
   const navigate = useNavigate();
 
   // State
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState(null);
   const [formData, setFormData] = useState({
@@ -40,6 +41,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       await axios.post(`${baseUrl}/api/admin/register`, formData);
       setStatus("success");
       setMessage("User Registered");
@@ -50,6 +52,8 @@ function Register() {
       console.log(error.response.data);
       setMessage(error.response.data.message);
       setStatus("danger");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,7 +146,10 @@ function Register() {
                         type="submit"
                         style={{ background: "linear-gradient(to right, #4caf50, #45a049)", color: "#fff" }}
                       >
-                        Register
+                        {loading ? "Please Wait..."
+                          : "Register"
+                        }
+
                       </Button>
                     </div>
                   </Row>

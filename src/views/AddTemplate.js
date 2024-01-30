@@ -19,6 +19,7 @@ import { baseUrl } from "variables/environment";
 
 function AddTemplate() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState(null);
   const [formData, setFormData] = useState({
@@ -42,6 +43,7 @@ function AddTemplate() {
       return;
     }
     try {
+      setLoading(true);
       await axios.post(`${baseUrl}/api/template/add`, formData);
       setStatus("success");
       setMessage("Template Added");
@@ -52,6 +54,8 @@ function AddTemplate() {
       console.log(error.response.data);
       setMessage(error.response.data.message);
       setStatus("danger");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,7 +102,9 @@ function AddTemplate() {
                   <Row>
                     <div className="update ml-auto mr-auto">
                       <Button className="btn-round" color="success" type="submit">
-                        Add
+                        {loading ? "Please Wait..."
+                          : "Add"
+                        }
                       </Button>
                       <Button
                         className="btn-round"

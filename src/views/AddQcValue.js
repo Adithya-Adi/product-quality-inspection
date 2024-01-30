@@ -21,6 +21,7 @@ import { useParams } from "react-router-dom";
 function AddQcValue() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState(null);
   const [formData, setFormData] = useState({
@@ -49,6 +50,7 @@ function AddQcValue() {
       }
     }
     try {
+      setLoading(true);
       await axios.post(`${baseUrl}/api/template/qcField/add/${id}`, formData);
       setStatus("success");
       setMessage("QC Field Added");
@@ -59,6 +61,8 @@ function AddQcValue() {
       console.log(error.response.data);
       setMessage(error.response.data.message);
       setStatus("danger");
+    }finally {
+      setLoading(false);
     }
   }
 
@@ -157,7 +161,9 @@ function AddQcValue() {
                         color="success"
                         type="submit"
                       >
-                        Add
+                        {loading ? "Please Wait..."
+                          : "Add"
+                        }
                       </Button>
                       <Button
                         className="btn-round"

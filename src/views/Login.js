@@ -10,7 +10,7 @@ import {
   Input,
   Row,
   Col,
-  Alert
+  Alert,
 } from "reactstrap";
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ function Login() {
   const navigate = useNavigate();
 
   // State
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState(null);
   const [formData, setFormData] = useState({
@@ -39,6 +40,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data: response } = await axios.post(`${baseUrl}/api/admin/login`, formData);
       localStorage.setItem("loggedInUser", response.data);
       localStorage.setItem("token", response.token);
@@ -51,6 +53,8 @@ function Login() {
       console.log(error.response.data);
       setMessage(error.response.data.message);
       setStatus("danger");
+    } finally {
+      setLoading(false);
     }
 
   };
@@ -123,7 +127,9 @@ function Login() {
                         type="submit"
                         style={{ background: "linear-gradient(to right, #4caf50, #45a049)", color: "#fff" }}
                       >
-                        Login
+                        {loading ? "Please Wait..."
+                          : "Login"
+                        }
                       </Button>
                     </div>
                   </Row>

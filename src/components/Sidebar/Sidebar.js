@@ -1,7 +1,8 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Nav } from "reactstrap";
+import { Nav, Button } from "reactstrap";
 import PerfectScrollbar from "perfect-scrollbar";
+import { useNavigate } from "react-router-dom";
 
 
 var ps;
@@ -9,6 +10,7 @@ var ps;
 function Sidebar(props) {
   const location = useLocation();
   const sidebar = React.useRef();
+  const navigate = useNavigate();
   const activeRoute = (routeName) => {
     return location.pathname.indexOf(routeName) > -1 ? "active" : "";
   };
@@ -25,6 +27,17 @@ function Sidebar(props) {
       }
     };
   });
+
+  const handleLogout = () => {
+    const confirmDelete = window.confirm("Are you sure you want to logout?");
+    if (!confirmDelete) {
+      return;
+    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("loggedInUser");
+    navigate("/login");
+  };
+
   return (
     <div
       className="sidebar"
@@ -32,7 +45,7 @@ function Sidebar(props) {
       data-active-color={props.activeColor}
     >
       <div className="logo">
-        
+
         <a
           href=" "
           className="simple-text logo-normal"
@@ -58,6 +71,15 @@ function Sidebar(props) {
             );
           })}
         </Nav>
+        <div style={{ position: "relative", left: "30%", top: "60%" }}>
+          <Button className="btn-round"
+            color="danger"
+            type="submit"
+            onClick={() => handleLogout()}
+          >
+            Logout
+          </Button>
+        </div>
       </div>
     </div>
   );

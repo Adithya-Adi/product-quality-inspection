@@ -21,6 +21,7 @@ function AddItem() {
   const navigate = useNavigate();
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     productPlanNo: "",
@@ -48,6 +49,7 @@ function AddItem() {
       }
     }
     try {
+      setLoading(true);
       await axios.post(`${baseUrl}/api/item/add`, formData);
       setStatus("success");
       setMessage("Item Added");
@@ -58,6 +60,8 @@ function AddItem() {
       console.log(error.response.data);
       setMessage(error.response.data.message);
       setStatus("danger");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -156,7 +160,9 @@ function AddItem() {
                         color="success"
                         type="submit"
                       >
-                        Add
+                        {loading ? "Please Wait..."
+                          : "Add"
+                        }
                       </Button>
                       <Button
                         className="btn-round"

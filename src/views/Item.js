@@ -80,7 +80,6 @@ function Item() {
 
   const handleDelete = async (itemId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete?");
-
     if (!confirmDelete) {
       return;
     }
