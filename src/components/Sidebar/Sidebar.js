@@ -49,6 +49,7 @@ function Sidebar(props) {
         <a
           href=" "
           className="simple-text logo-normal"
+          style={{fontSize: "14px"}}
         >
           Product Quality Inspection
         </a>
